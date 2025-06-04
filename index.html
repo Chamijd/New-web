@@ -2,363 +2,194 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CHAMA-MD-WEB</title>
   <style>
     :root {
-      --bg-light: #f0f0f0;
-      --text-light: #222;
-      --bg-dark: #121212;
-      --text-dark: #eee;
-      --primary-gradient: linear-gradient(45deg, #00f0ff, #ff00cc, #00ff55, #ffcc00);
+      --bg-dark: #0a0f1d;
+      --bg-light: #ffffff;
+      --text-dark: #ffffff;
+      --text-light: #000000;
+      --primary: #ff0076;
+      --secondary: #9b00ff;
     }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0; padding: 0;
-      background-color: var(--bg-light);
-      color: var(--text-light);
-      transition: background-color 0.3s, color 0.3s;
-    }
-    body.dark {
-      background-color: var(--bg-dark);
+      background: var(--bg-dark);
       color: var(--text-dark);
-    }
-
-    /* Loading Screen */
-    .loading-screen {
-      position: fixed;
-      width: 100%; height: 100%;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 9999;
-    }
-    .loader {
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      border: 8px solid transparent;
-      border-top: 8px solid #fff;
-      animation: spin 1s linear infinite;
-      position: relative;
-      margin-bottom: 10px;
-    }
-    .loader::before {
-      content: "";
-      position: absolute;
-      top: -8px; left: -8px; right: -8px; bottom: -8px;
-      border-radius: 50%;
-      background: linear-gradient(45deg, #00f0ff, #ff00cc, #00ff55, #ffcc00);
-      background-size: 1000% 1000%;
-      animation: gradientSpin 4s ease infinite;
-      z-index: -1;
-    }
-    .loader::after {
-      content: "";
-      position: absolute;
-      top: 8px; left: 8px; right: 8px; bottom: 8px;
-      background: #000;
-      border-radius: 50%;
-      z-index: 1;
-    }
-    @keyframes spin {
-      0% {transform: rotate(0deg);}
-      100% {transform: rotate(360deg);}
-    }
-    @keyframes gradientSpin {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
-
-    .container {
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      transition: background-color 0.3s, color 0.3s;
-    }
-    body.dark .container {
-      background: rgba(30,30,30,0.9);
-      box-shadow: 0 0 20px rgba(0,0,0,0.8);
-    }
-
-    h1 {
-      color: #00f0ff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
       text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    body.light {
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    h2 {
+      font-size: 28px;
       margin-bottom: 20px;
     }
 
-    /* Buttons */
-    .button {
-      background: var(--primary-gradient);
-      background-size: 400% 400%;
-      color: #000;
-      padding: 12px 25px;
-      border-radius: 12px;
-      font-weight: bold;
-      text-decoration: none;
-      margin: 10px 5px;
-      display: inline-block;
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.2s ease;
-      animation: gradientSpin 8s ease infinite;
-      border: none;
-    }
-    .button:hover {
-      transform: scale(1.05);
-    }
-
-    /* Comment Box */
-    .comment-box {
-      margin-top: 30px;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 10px;
-      border: 1.5px solid #ccc;
-      font-size: 16px;
-      resize: vertical;
-      transition: border-color 0.3s;
-    }
-    input:focus, textarea:focus {
-      border-color: #00f0ff;
-      outline: none;
-    }
-    body.dark input, body.dark textarea {
-      background: #222;
-      border-color: #444;
-      color: #eee;
-    }
-
-    .submit-btn {
-      margin-top: 15px;
-      background: var(--primary-gradient);
-      border: none;
-      color: #000;
-      padding: 12px 25px;
-      font-weight: 700;
-      border-radius: 12px;
-      cursor: pointer;
-      animation: gradientSpin 8s ease infinite;
-      transition: transform 0.2s ease;
-    }
-    .submit-btn:hover {
-      transform: scale(1.05);
-    }
-
-    /* Comments List */
-    #comments {
-      margin-top: 30px;
-      text-align: left;
-    }
-    .comment {
-      background: rgba(0, 240, 255, 0.1);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 15px;
-      position: relative;
-      word-wrap: break-word;
-      transition: background-color 0.3s;
-    }
-    body.dark .comment {
-      background: rgba(0, 240, 255, 0.15);
-    }
-    .comment strong {
-      color: #00f0ff;
-    }
-    .comment small {
-      color: #bbb;
-      font-size: 12px;
-      display: block;
-      margin-top: 8px;
-    }
-
-    /* Reply button */
-    .reply-btn {
-      position: absolute;
-      right: 15px;
-      bottom: 10px;
-      font-size: 12px;
-      color: #00f0ff;
-      cursor: pointer;
-      user-select: none;
-      transition: color 0.3s;
-    }
-    .reply-btn:hover {
-      color: #ff00cc;
-    }
-
-    /* Light/Dark toggle */
-    #toggleTheme {
+    .theme-toggle {
       position: fixed;
-      top: 20px;
-      right: 20px;
-      background: var(--primary-gradient);
+      top: 10px;
+      right: 10px;
+      background: var(--primary);
+      color: white;
+      padding: 10px 14px;
       border: none;
-      padding: 10px 18px;
-      border-radius: 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .audio-control {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: var(--secondary);
+      color: white;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    input, textarea {
+      width: 85%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    button.submit {
+      background: linear-gradient(to right, var(--secondary), var(--primary));
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
       font-weight: bold;
-      color: #000;
       cursor: pointer;
-      user-select: none;
-      animation: gradientSpin 8s ease infinite;
-      transition: transform 0.3s ease;
-      z-index: 10000;
-    }
-    #toggleTheme:hover {
-      transform: scale(1.1);
+      font-size: 16px;
+      margin-top: 10px;
     }
 
-    /* Audio Player */
-    #audioPlayerContainer {
-      margin: 30px auto 0 auto;
-      text-align: center;
-    }
-    #audioPlayer {
-      display: none;
-    }
-    #playPauseBtn {
-      background: var(--primary-gradient);
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 24px;
-      color: #000;
-      cursor: pointer;
-      user-select: none;
-      animation: gradientSpin 8s ease infinite;
-      transition: transform 0.3s ease;
-    }
-    #playPauseBtn:hover {
-      transform: scale(1.2);
+    .comment {
+      background: rgba(255,255,255,0.05);
+      padding: 15px;
+      border-radius: 12px;
+      margin: 12px auto;
+      max-width: 700px;
+      text-align: left;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
 
+    .comment strong {
+      color: var(--primary);
+      font-size: 18px;
+    }
+
+    .comment small {
+      color: #ccc;
+      font-size: 12px;
+    }
+
+    .reply {
+      margin-top: 10px;
+      padding-left: 20px;
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    .reply small {
+      font-size: 11px;
+      color: #999;
+    }
   </style>
 </head>
 <body>
+  <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
+  <button class="audio-control" onclick="toggleAudio()">🎵 Play</button>
+  <audio id="bg-audio" src="https://github.com/Chamijd/KHAN-DATA/raw/refs/heads/main/autovoice/cm4ozo.mp3" autoplay hidden loop></audio>
 
-  <button id="toggleTheme" title="Toggle Light/Dark Mode">🌙</button>
+  <h2>💬 Comment</h2>
+  <input type="text" id="name" placeholder="Your Name" />
+  <textarea id="comment" placeholder="Your Comment 😊"></textarea><br/>
+  <button class="submit" onclick="submitComment()">Post Comment</button>
 
-  <div class="loading-screen" id="loading-screen">
-    <div class="loader"></div>
-    <div style="color: #00f0ff; font-weight: bold;">Initializing CHAMA-MD...</div>
-  </div>
-
-  <div class="container" id="main-content" style="display:none;">
-    <h1>CHAMA-MD SYSTEM</h1>
-
-    <div class="button-container" style="text-align:center;">
-      <button class="button" onclick="alert('Pair Code clicked')">🔗 Pair Code</button>
-      <button class="button" onclick="alert('QR Code clicked')">QR Code</button>
-     
-    </div>
-
-    <!-- Audio Player -->
-    <div id="audioPlayerContainer">
-      <audio id="audioPlayer" src="https://github.com/Chamijd/KHAN-DATA/raw/refs/heads/main/autovoice/cm4ozo.mp3" loop></audio>
-      <button id="playPauseBtn" aria-label="Play/Pause Audio">▶️</button>
-    </div>
-
-    <!-- Comment Box -->
-    <div class="comment-box">
-      <h3>💬 Comment</h3>
-      <input type="text" id="name" placeholder="Your Name" />
-      <textarea id="comment" rows="3" placeholder="Your Comment 😊"></textarea>
-      <button class="submit-btn" onclick="submitComment()">Post Comment</button>
-      <div id="comments"></div>
-    </div>
-  </div>
+  <div id="comments"></div>
 
   <script>
-    // Loading screen hide after 2 sec
-    window.onload = () => {
-      setTimeout(() => {
-        document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
-      }, 2000);
-
-      // Load theme from localStorage
-      if(localStorage.getItem('theme') === 'dark'){
-        document.body.classList.add('dark');
-        document.getElementById('toggleTheme').textContent = '☀️';
-      }
-    };
-
-    // Toggle light/dark mode
-    document.getElementById('toggleTheme').addEventListener('click', () => {
-      document.body.classList.toggle('dark');
-      if(document.body.classList.contains('dark')){
-        localStorage.setItem('theme', 'dark');
-        document.getElementById('toggleTheme').textContent = '☀️';
-      } else {
-        localStorage.setItem('theme', 'light');
-        document.getElementById('toggleTheme').textContent = '🌙';
-      }
-    });
-
-    // Audio Player controls
-    const audio = document.getElementById('audioPlayer');
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    let isPlaying = false;
-
-    playPauseBtn.addEventListener('click', () => {
-      if (isPlaying) {
-        audio.pause();
-        playPauseBtn.textContent = '▶️';
-      } else {
-        audio.play();
-        playPauseBtn.textContent = '⏸️';
-      }
+    const audio = document.getElementById("bg-audio");
+    let isPlaying = true;
+    function toggleAudio() {
+      isPlaying ? audio.pause() : audio.play();
       isPlaying = !isPlaying;
-    });
+      document.querySelector(".audio-control").textContent = isPlaying ? "🎵 Pause" : "▶️ Play";
+    }
 
-    // Comments
+    function toggleTheme() {
+      document.body.classList.toggle('light');
+    }
+
     function submitComment() {
       const name = document.getElementById('name').value.trim();
       const comment = document.getElementById('comment').value.trim();
-      if (!name || !comment) {
-        alert('Please enter your name and comment.');
-        return;
-      }
-      const commentsDiv = document.getElementById('comments');
-      const commentHTML = `
-        <div class="comment">
-          <strong>${escapeHtml(name)}</strong><br/>
-          ${escapeHtml(comment).replace(/\n/g, '<br>')}<br/>
-          <small>${new Date().toLocaleString()}</small>
-          <span class="reply-btn" onclick="replyTo('${escapeJs(name)}')">↩️ Reply</span>
-        </div>
-      `;
-      commentsDiv.insertAdjacentHTML('beforeend', commentHTML);
-      document.getElementById('name').value = '';
-      document.getElementById('comment').value = '';
-    }
+      if (!name || !comment) return alert("Fill out both fields!");
 
-    function replyTo(name) {
-      const commentInput = document.getElementById('comment');
-      commentInput.value = '@' + name + ' ';
-      commentInput.focus();
-    }
-
-    // Helper to escape HTML special chars
-    function escapeHtml(text) {
-      return text.replace(/[&<>"']/g, function(m) {
-        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
+      fetch('/comments', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ name, comment })
+      }).then(res => {
+        if(res.ok) {
+          document.getElementById('name').value = '';
+          document.getElementById('comment').value = '';
+          loadComments();
+        }
       });
     }
 
-    // Escape for JS string inside onclick
-    function escapeJs(text) {
-      return text.replace(/'/g, "\\'");
+    function loadComments() {
+      fetch('/comments')
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('comments');
+          container.innerHTML = data.map(c => `
+            <div class="comment">
+              <strong>${c.name}</strong><br/>
+              <span>${c.comment}</span><br/>
+              <small>${new Date(c.date).toLocaleString()}</small><br/>
+              <input type="text" placeholder="Reply..." onchange="submitReply('${c._id}', this.value)"/>
+              <div id="replies-${c._id}">
+                ${c.replies?.map(r => `<div class='reply'><strong>${r.name}</strong>: ${r.comment}<br/><small>${new Date(r.date).toLocaleString()}</small></div>`).join('') || ''}
+              </div>
+            </div>
+          `).join('');
+        });
     }
+
+    function submitReply(parentId, value) {
+      const name = prompt("Your name?");
+      if (!name || !value) return;
+      fetch('/comments/reply', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ parentId, name, comment: value })
+      }).then(res => {
+        if(res.ok) loadComments();
+      });
+    }
+
+    loadComments();
   </script>
 </body>
 </html>
