@@ -1,151 +1,380 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>CHAMA MD WEB</title>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CHAMA-MD-V1 SYSTEM</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     :root {
-      --bg-dark: #000428;
-      --bg-light: #ffffff;
-      --text-dark: #ffffff;
-      --text-light: #000000;
-      --highlight: #ffdd57;
+      --bg-dark: #0f2027;
+      --bg-light: #f0f0f0;
+      --text-dark: #fff;
+      --text-light: #000;
+      --accent: #00f0ff;
     }
+
     body {
-      background: var(--bg-dark);
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark), #2c5364);
       color: var(--text-dark);
-      font-family: sans-serif;
-      padding: 30px;
-      text-align: center;
-      transition: all 0.3s ease;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      transition: background 0.5s, color 0.5s;
     }
-    body.light {
-      background: var(--bg-light);
+
+    body.light-mode {
+      background: linear-gradient(135deg, var(--bg-light), #e0e0e0);
       color: var(--text-light);
     }
-    input, textarea {
-      width: 80%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      font-size: 16px;
-    }
-    button {
-      background: linear-gradient(to right,#9b00ff,#ff0076);
-      color: white;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    .comment {
-      background-color: rgba(255,255,255,0.1);
-      padding: 15px;
-      border-radius: 12px;
-      margin: 10px auto;
-      max-width: 600px;
-      text-align: left;
-      box-shadow: 0 0 10px rgba(255,255,255,0.2);
-    }
-    .comment strong {
-      color: var(--highlight);
-      font-size: 18px;
-    }
-    .comment small {
-      color: #ccc;
-      font-size: 12px;
-    }
-    #comments {
-      margin-top: 30px;
-    }
-    .reply {
-      margin-top: 10px;
-      padding-left: 20px;
-      font-size: 14px;
-      color: #f1f1f1;
-    }
-    .reply small {
-      font-size: 11px;
-      color: #ccc;
-    }
-    .theme-toggle {
-      position: absolute;
+
+    .toggle-mode {
+      position: fixed;
       top: 10px;
       right: 10px;
+      z-index: 999;
+      background: var(--accent);
+      color: #000;
+      padding: 8px 14px;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .toggle-audio {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 999;
+      background: var(--accent);
+      color: #000;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .loading-screen {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      flex-direction: column;
+    }
+
+    .loader {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    .loader::before {
+      content: "";
+      position: absolute;
+      top: -8px; left: -8px; right: -8px; bottom: -8px;
+      border-radius: 50%;
+      background: linear-gradient(270deg, #00f0ff, #ff00cc, #00ff55, #ffcc00, #00f0ff);
+      background-size: 1000% 1000%;
+      animation: gradientSpin 4s ease infinite;
+      z-index: -1;
+    }
+
+    .loader::after {
+      content: "";
+      position: absolute;
+      top: 8px; left: 8px; right: 8px; bottom: 8px;
+      background: #000;
+      border-radius: 50%;
+      z-index: 1;
+    }
+
+    .loader {
+      border: 8px solid transparent;
+      border-top: 8px solid #fff;
+      box-sizing: border-box;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes gradientSpin {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: var(--accent);
+    }
+
+    .system-info {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--accent);
+      border-radius: 15px;
+      padding: 20px;
+      display: inline-block;
+      text-align: left;
+      backdrop-filter: blur(10px);
+      margin-bottom: 30px;
+    }
+
+    .info {
+      margin: 12px 0;
+      font-size: 18px;
+    }
+
+    #battery-info {
+      color: #00ffcc;
+      font-weight: bold;
+      text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc;
+    }
+
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+
+    .button {
+      background: linear-gradient(45deg, #00f0ff, #ff00cc, #00ff55, #ffcc00);
+      background-size: 400% 400%;
+      color: #000;
+      padding: 14px 24px;
+      font-size: 18px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s;
+      display: inline-flex;
+      align-items: center;
+      animation: buttonColorShift 8s ease infinite;
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+    }
+
+    .button i {
+      margin-right: 10px;
+    }
+
+    .button:hover {
+      filter: brightness(1.2);
+      transform: scale(1.07);
+      box-shadow: 0 0 20px #00f0ff;
+    }
+
+    @keyframes buttonColorShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .comment-box {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 600px;
+      margin: auto;
+      color: white;
+      margin-bottom: 60px;
+    }
+
+    .comment-box button {
+      background: var(--accent);
+      color: #000;
+      padding: 10px 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      margin-top: 10px;
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .comment {
+      margin-top: 20px;
+      text-align: left;
+      background: rgba(255,255,255,0.08);
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .comment small {
+      color: #ccc;
     }
   </style>
 </head>
-<body>
-  <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-  <h2>💬 Leave a Comment</h2>
-  <input type="text" id="name" placeholder="Your Name"/><br/>
-  <textarea id="comment" placeholder="Your Comment 😊"></textarea><br/>
-  <button onclick="submitComment()">Post Comment</button>
+<body onload="startLoading()">
+  <audio id="login-audio" src="https://github.com/Chamijd/KHAN-DATA/raw/refs/heads/main/autovoice/cm4ozo.mp3" autoplay loop></audio>
+  <div class="toggle-audio" onclick="toggleAudio()">🔊</div>
+  <div class="toggle-mode" onclick="toggleMode()">🌙</div>
 
-  <div id="comments"></div>
+  <div class="loading-screen" id="loading-screen">
+    <div class="loader"></div>
+    <div>Initializing CHAMA-MD...</div>
+  </div>
+
+  <div class="container" style="display:none;" id="main-content">
+    <h1>CHAMA-MD-V1 SYSTEM</h1>
+    <div class="system-info">
+      <div class="info" id="ip-info">IP Address: Loading...</div>
+      <div class="info" id="time-info">Time: Loading...</div>
+      <div class="info" id="weather-info">Weather: Loading...</div>
+      <div class="info" id="battery-info"><i class="fas fa-battery-half"></i> Battery Level: Loading...</div>
+    </div>
+
+    <div class="button-container">
+      <a href="/pair" class="button"><i class="fas fa-link"></i> Pair Code</a>
+      <a href="/qr" class="button"><i class="fas fa-qrcode"></i> QR Code</a>
+      <a href="https://github.com/CHMA2009/-CHAMA-MD/fork" class="button" target="_blank"><i class="fas fa-code-branch"></i> Bot Fork</a>
+    </div>
+
+    <div class="comment-box">
+      <h3>💬 Leave a Comment</h3>
+      <input type="text" id="name" placeholder="Your Name" />
+      <textarea id="comment" placeholder="Your Comment 😊"></textarea>
+      <button onclick="submitComment()">Post Comment</button>
+      <div id="comments"></div>
+    </div>
+  </div>
 
   <script>
-    function toggleTheme() {
-      document.body.classList.toggle('light');
+    const audio = document.getElementById("login-audio");
+    let isPlaying = true;
+
+    function toggleAudio() {
+      if (isPlaying) {
+        audio.pause();
+        event.target.innerText = "🔇";
+      } else {
+        audio.play();
+        event.target.innerText = "🔊";
+      }
+      isPlaying = !isPlaying;
+    }
+
+    function toggleMode() {
+      document.body.classList.toggle("light-mode");
+    }
+
+    function startLoading() {
+      setTimeout(() => {
+        document.getElementById("loading-screen").style.display = "none";
+        document.getElementById("main-content").style.display = "block";
+        fetchIPAndTime();
+        fetchWeather();
+        fetchBatteryLevel();
+        loadComments();
+      }, 2000);
+    }
+
+    function fetchIPAndTime() {
+      fetch("https://api.ipify.org?format=json")
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("ip-info").innerText = "IP Address: " + data.ip;
+        });
+
+      const now = new Date();
+      document.getElementById("time-info").innerText = "Time: " + now.toLocaleTimeString();
+    }
+
+    function fetchWeather() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            fetch(`https://api.weatherapi.com/v1/current.json?key=4d673b437b5b4e92952155513242605&q=${lat},${lon}`)
+              .then(res => res.json())
+              .then(data => {
+                const condition = data.current.condition.text;
+                const temp = data.current.temp_c;
+                document.getElementById("weather-info").innerText = `Weather: ${condition}, ${temp}°C`;
+              });
+          },
+          () => {
+            document.getElementById("weather-info").innerText = "Weather: Location permission denied.";
+          }
+        );
+      }
+    }
+
+    async function fetchBatteryLevel() {
+      if (navigator.getBattery) {
+        const battery = await navigator.getBattery();
+        const level = Math.round(battery.level * 100);
+        document.getElementById("battery-info").innerHTML = `<i class="fas fa-battery-half"></i> Battery Level: ${level}%`;
+        battery.addEventListener("levelchange", () => {
+          const updated = Math.round(battery.level * 100);
+          document.getElementById("battery-info").innerHTML = `<i class="fas fa-battery-half"></i> Battery Level: ${updated}%`;
+        });
+      } else {
+        document.getElementById("battery-info").innerText = "Battery info not supported.";
+      }
     }
 
     function submitComment() {
-      const name = document.getElementById('name').value.trim();
-      const comment = document.getElementById('comment').value.trim();
-      if (!name || !comment) return alert("Fill out both fields!");
+      const name = document.getElementById("name").value.trim();
+      const comment = document.getElementById("comment").value.trim();
+      if (!name || !comment) return alert("Name & Comment required!");
 
-      fetch('/comments', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+      fetch("/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, comment })
       }).then(res => {
-        if(res.ok) {
-          document.getElementById('name').value = '';
-          document.getElementById('comment').value = '';
+        if (res.ok) {
+          document.getElementById("name").value = "";
+          document.getElementById("comment").value = "";
           loadComments();
         }
       });
     }
 
     function loadComments() {
-      fetch('/comments')
+      fetch("/comments")
         .then(res => res.json())
         .then(data => {
-          const container = document.getElementById('comments');
+          const container = document.getElementById("comments");
           container.innerHTML = data.map(c => `
             <div class="comment">
               <strong>${c.name}</strong><br/>
-              <span>${c.comment}</span><br/>
-              <small>${new Date(c.date).toLocaleString()}</small><br/>
-              <input type="text" placeholder="Reply..." onchange="submitReply('${c._id}', this.value)"/>
-              <div id="replies-${c._id}">
-                ${c.replies?.map(r => `<div class='reply'><strong>${r.name}</strong>: ${r.comment}<br/><small>${new Date(r.date).toLocaleString()}</small></div>`).join('') || ''}
-              </div>
+              ${c.comment}<br/>
+              <small>${new Date(c.date).toLocaleString()}</small>
             </div>
           `).join('');
         });
     }
-
-    function submitReply(parentId, value) {
-      const name = prompt("Your name?");
-      if (!name || !value) return;
-      fetch('/comments/reply', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ parentId, name, comment: value })
-      }).then(res => {
-        if(res.ok) loadComments();
-      });
-    }
-
-    loadComments();
   </script>
 </body>
 </html>
