@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CHAMA-MD-WEB</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     :root {
       --bg-dark: #0a0f1d;
@@ -14,7 +14,6 @@
       --primary: #ff0076;
       --secondary: #9b00ff;
     }
-
     body {
       background: var(--bg-dark);
       color: var(--text-dark);
@@ -23,12 +22,10 @@
       text-align: center;
       transition: all 0.3s ease;
     }
-
     body.light {
       background: var(--bg-light);
       color: var(--text-light);
     }
-
     .theme-toggle, .audio-control {
       position: fixed;
       top: 10px;
@@ -39,17 +36,14 @@
       font-size: 16px;
       color: white;
     }
-
     .theme-toggle {
       right: 10px;
       background: var(--primary);
     }
-
     .audio-control {
       left: 10px;
       background: var(--secondary);
     }
-
     .button-container {
       margin: 20px auto;
       display: flex;
@@ -57,7 +51,6 @@
       flex-wrap: wrap;
       gap: 15px;
     }
-
     .button-container .button {
       background: linear-gradient(to right, var(--secondary), var(--primary));
       color: white;
@@ -69,11 +62,9 @@
       box-shadow: 0 0 8px rgba(0,0,0,0.3);
       transition: transform 0.2s;
     }
-
     .button:hover {
       transform: scale(1.05);
     }
-
     .description-box {
       max-width: 700px;
       margin: 30px auto 10px;
@@ -83,12 +74,10 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
       font-size: 16px;
     }
-
     h2 {
       font-size: 28px;
       margin-bottom: 20px;
     }
-
     input, textarea {
       width: 85%;
       padding: 10px;
@@ -99,7 +88,6 @@
       font-size: 16px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
-
     button.submit {
       background: linear-gradient(to right, var(--secondary), var(--primary));
       color: white;
@@ -111,7 +99,6 @@
       font-size: 16px;
       margin-top: 10px;
     }
-
     .comment {
       background: rgba(255,255,255,0.05);
       padding: 15px;
@@ -121,27 +108,31 @@
       text-align: left;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
-
     .comment strong {
       color: var(--primary);
       font-size: 18px;
     }
-
     .comment small {
       color: #ccc;
       font-size: 12px;
     }
-
     .reply {
       margin-top: 10px;
       padding-left: 20px;
       font-size: 14px;
       color: #ccc;
     }
-
     .reply small {
       font-size: 11px;
       color: #999;
+    }
+    .reply-input {
+      margin-top: 8px;
+      width: 90%;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #555;
+      font-size: 14px;
     }
   </style>
 </head>
@@ -154,12 +145,12 @@
   <div class="button-container">
     <a href="/pair" class="button"><i class="fas fa-link"></i> Pair Code</a>
     <a href="/qr" class="button"><i class="fas fa-qrcode"></i> QR Code</a>
-    <a href="https://github.com/CHMA2009/-CHAMA-MD/fork" class="button"><i class="fas fa-code-branch"></i> Bot Fork</a>
+    <a href="https://github.com/CHMA2009/-CHAMA-MD/fork" target="_blank" class="button"><i class="fas fa-code-branch"></i> Bot Fork</a>
   </div>
 
   <!-- CUSTOM DESCRIPTION -->
   <div class="description-box">
-    🌟 Welcome to <strong>CHAMA-MD</strong>! This bot allows you to pair via code or QR, explore GitHub forks, and much more! Leave your ideas or issues below 👇
+    🌟 Welcome to <strong>CHAMA-MD</strong>! This bot allows you to pair via code or QR, explore GitHub forks, and much more! Leave your ideas or issues below 🥰🥰👇
   </div>
 
   <!-- COMMENT SYSTEM -->
@@ -183,52 +174,87 @@
       document.body.classList.toggle('light');
     }
 
-    function submitComment() {
+    async function submitComment() {
       const name = document.getElementById('name').value.trim();
       const comment = document.getElementById('comment').value.trim();
       if (!name || !comment) return alert("Fill out both fields!");
-
-      fetch('/comments', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ name, comment })
-      }).then(res => {
-        if(res.ok) {
+      try {
+        const res = await fetch('/comments', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ name, comment })
+        });
+        if (res.ok) {
           document.getElementById('name').value = '';
           document.getElementById('comment').value = '';
           loadComments();
+        } else {
+          alert('Error submitting comment');
         }
-      });
+      } catch(e) {
+        alert('Network error');
+      }
     }
 
-    function loadComments() {
-      fetch('/comments')
-        .then(res => res.json())
-        .then(data => {
-          const container = document.getElementById('comments');
-          container.innerHTML = data.map(c => `
-            <div class="comment">
-              <strong>${c.name}</strong><br/>
-              <span>${c.comment}</span><br/>
-              <small>${new Date(c.date).toLocaleString()}</small><br/>
-              <input type="text" placeholder="Reply..." onchange="submitReply('${c._id}', this.value)"/>
-              <div id="replies-${c._id}">
-                ${c.replies?.map(r => `<div class='reply'><strong>${r.name}</strong>: ${r.comment}<br/><small>${new Date(r.date).toLocaleString()}</small></div>`).join('') || ''}
-              </div>
-            </div>
-          `).join('');
-        });
-    }
-
-    function submitReply(parentId, value) {
+    async function submitReply(parentId, replyInput) {
+      const replyText = replyInput.value.trim();
+      if (!replyText) return alert('Reply cannot be empty!');
       const name = prompt("Your name?");
-      if (!name || !value) return;
-      fetch('/comments/reply', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ parentId, name, comment: value })
-      }).then(res => {
-        if(res.ok) loadComments();
+      if (!name) return alert('Reply must have a name!');
+      try {
+        const res = await fetch('/comments/reply', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ parentId, name, comment: replyText })
+        });
+        if (res.ok) {
+          replyInput.value = '';
+          loadComments();
+        } else {
+          alert('Error submitting reply');
+        }
+      } catch(e) {
+        alert('Network error');
+      }
+    }
+
+    async function loadComments() {
+      try {
+        const res = await fetch('/comments');
+        const data = await res.json();
+        const container = document.getElementById('comments');
+        container.innerHTML = data.map(c => `
+          <div class="comment">
+            <strong>${escapeHtml(c.name)}</strong><br/>
+            <span>${escapeHtml(c.comment)}</span><br/>
+            <small>${new Date(c.date).toLocaleString()}</small><br/>
+            <input class="reply-input" type="text" placeholder="Reply..." onkeydown="if(event.key==='Enter'){submitReply('${c._id}', this)}"/>
+            <div id="replies-${c._id}">
+              ${c.replies?.map(r => `
+                <div class="reply">
+                  <strong>${escapeHtml(r.name)}</strong>: ${escapeHtml(r.comment)}<br/>
+                  <small>${new Date(r.date).toLocaleString()}</small>
+                </div>
+              `).join('') || ''}
+            </div>
+          </div>
+        `).join('');
+      } catch(e) {
+        console.error('Failed to load comments', e);
+      }
+    }
+
+    // Simple HTML escape to prevent XSS
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/[&<>"']/g, function(m) {
+        return ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        })[m];
       });
     }
 
