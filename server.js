@@ -1,4 +1,3 @@
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -11,17 +10,10 @@ app.use(express.static(__dirname));
 
 mongoose.connect('mongodb+srv://jikew32666:nih7jgcq1pkSSyGY@cluster0.jbdxjkc.mongodb.net/autoreplydb');
 
-const ReplySchema = new mongoose.Schema({
-  name: String,
-  comment: String,
-  date: { type: Date, default: Date.now }
-});
-
 const CommentSchema = new mongoose.Schema({
   name: String,
   comment: String,
-  date: { type: Date, default: Date.now },
-  replies: [ReplySchema]
+  date: { type: Date, default: Date.now }
 });
 const Comment = mongoose.model('Comment', CommentSchema);
 
@@ -38,13 +30,14 @@ app.post('/comments', async (req, res) => {
   res.status(201).json(newComment);
 });
 
-app.post('/comments/reply', async (req, res) => {
-  const { parentId, name, comment } = req.body;
-  const parent = await Comment.findById(parentId);
-  if (!parent) return res.status(404).json({ error: 'Comment not found' });
-  parent.replies.push({ name, comment });
-  await parent.save();
-  res.status(201).json(parent);
+app.delete('/comments/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    await Comment.deleteOne({ _id: id });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Delete failed' });
+  }
 });
 
 app.listen(3000, () => console.log('Server running on port 3000'));
