@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CHAMA-MD-WEB</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
       --bg-dark: #0a0f1d;
@@ -28,35 +29,64 @@
       color: var(--text-light);
     }
 
-    h2 {
-      font-size: 28px;
-      margin-bottom: 20px;
+    .theme-toggle, .audio-control {
+      position: fixed;
+      top: 10px;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      color: white;
     }
 
     .theme-toggle {
-      position: fixed;
-      top: 10px;
       right: 10px;
       background: var(--primary);
-      color: white;
-      padding: 10px 14px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
     }
 
     .audio-control {
-      position: fixed;
-      top: 10px;
       left: 10px;
       background: var(--secondary);
+    }
+
+    .button-container {
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .button-container .button {
+      background: linear-gradient(to right, var(--secondary), var(--primary));
       color: white;
-      padding: 10px 14px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
       font-size: 16px;
+      font-weight: bold;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+    }
+
+    .button:hover {
+      transform: scale(1.05);
+    }
+
+    .description-box {
+      max-width: 700px;
+      margin: 30px auto 10px;
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      font-size: 16px;
+    }
+
+    h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
     }
 
     input, textarea {
@@ -116,11 +146,24 @@
   </style>
 </head>
 <body>
-  <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
-  <button class="audio-control" onclick="toggleAudio()">🎵 Play</button>
+  <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+  <button class="audio-control" onclick="toggleAudio()">🔊</button>
   <audio id="bg-audio" src="https://github.com/Chamijd/KHAN-DATA/raw/refs/heads/main/autovoice/cm4ozo.mp3" autoplay hidden loop></audio>
 
-  <h2>💬 Comment</h2>
+  <!-- BUTTONS -->
+  <div class="button-container">
+    <a href="/pair" class="button"><i class="fas fa-link"></i> Pair Code</a>
+    <a href="/qr" class="button"><i class="fas fa-qrcode"></i> QR Code</a>
+    <a href="https://github.com/CHMA2009/-CHAMA-MD/fork" class="button"><i class="fas fa-code-branch"></i> Bot Fork</a>
+  </div>
+
+  <!-- CUSTOM DESCRIPTION -->
+  <div class="description-box">
+    🌟 Welcome to <strong>CHAMA-MD</strong>! This bot allows you to pair via code or QR, explore GitHub forks, and much more! Leave your ideas or issues below 👇
+  </div>
+
+  <!-- COMMENT SYSTEM -->
+  <h2>💬 Leave a Comment</h2>
   <input type="text" id="name" placeholder="Your Name" />
   <textarea id="comment" placeholder="Your Comment 😊"></textarea><br/>
   <button class="submit" onclick="submitComment()">Post Comment</button>
@@ -133,7 +176,7 @@
     function toggleAudio() {
       isPlaying ? audio.pause() : audio.play();
       isPlaying = !isPlaying;
-      document.querySelector(".audio-control").textContent = isPlaying ? "🎵 Pause" : "▶️ Play";
+      document.querySelector(".audio-control").textContent = isPlaying ? "🔇" : "🔊";
     }
 
     function toggleTheme() {
